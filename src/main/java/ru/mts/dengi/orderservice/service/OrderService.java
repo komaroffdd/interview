@@ -13,6 +13,7 @@ import ru.mts.dengi.orderservice.repository.OrderRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ public class OrderService {
         order.setStatus("PENDING");
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
+        order.setItems(new ArrayList<>());
 
         List<OrderItem> items = request.getItems().stream()
                 .map(item -> {
@@ -38,6 +40,7 @@ public class OrderService {
                     orderItem.setProductName(item.getProductName());
                     orderItem.setQuantity(item.getQuantity());
                     orderItem.setPrice(BigDecimal.valueOf(item.getPrice()));
+                    orderItem.setOrder(order);
                     return orderItem;
                 })
                 .collect(Collectors.toList());
@@ -48,7 +51,6 @@ public class OrderService {
 
         order.setTotalAmount(totalAmount);
         order.setItems(items);
-        items.forEach(item -> item.setOrderId(order.getId()));
 
         Order savedOrder = orderRepository.save(order);
 
@@ -79,7 +81,6 @@ public class OrderService {
 
         Order updatedOrder = orderRepository.save(order);
 
-        // Send status update event
         kafkaProducerService.sendOrderEvent(updatedOrder);
 
         return convertToResponse(updatedOrder);

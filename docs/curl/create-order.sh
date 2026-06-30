@@ -1,5 +1,5 @@
 # Базовый заказ с одним товаром
-curl -X POST http://localhost:8080/api/v1/orders \
+curl -X POST http://localhost:8080/api/orders \
   -H "Content-Type: application/json" \
   -d '{
     "customerId": 1,

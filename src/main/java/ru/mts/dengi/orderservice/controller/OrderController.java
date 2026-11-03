@@ -6,7 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mts.dengi.orderservice.dto.CreateOrderRequest;
 import ru.mts.dengi.orderservice.dto.OrderResponse;
+import ru.mts.dengi.orderservice.dto.PaymentRequest;
+import ru.mts.dengi.orderservice.dto.PaymentResponse;
 import ru.mts.dengi.orderservice.service.OrderService;
+import ru.mts.dengi.orderservice.service.PaymentService;
 
 import java.util.List;
 
@@ -16,11 +19,18 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final PaymentService paymentService;
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(@RequestBody CreateOrderRequest request) {
         OrderResponse response = orderService.createOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/order{id}/payments")
+    public ResponseEntity<PaymentResponse> execute(@RequestBody PaymentRequest paymentRequest, @PathVariable Long orderId) {
+        PaymentResponse paymentResponse = paymentService.execute(paymentRequest, orderId);
+        return ResponseEntity.ok(paymentResponse);
     }
 
     @GetMapping("/{orderId}")
